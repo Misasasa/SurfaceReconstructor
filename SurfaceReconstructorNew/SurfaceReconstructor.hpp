@@ -5,10 +5,12 @@
 #include "SPHHelper.hpp"
 #include "SurfaceGrids.h"
 
-#define OUTSIDE 999
+#include "MarchingCube.h"
+
 
 class SurfaceReconstructor{
-    private:
+public:
+
     ParticleData particleData;
     ZIndexGrid zGrid;
     SPHHelper sphHelper;
@@ -21,7 +23,7 @@ class SurfaceReconstructor{
     int neighborThres;
     veci surfaceParticleMark;
 
-    public:
+    
     SurfaceReconstructor(){
         particleSpacing = 1;
         infectRadius = 2;
@@ -53,12 +55,12 @@ class SurfaceReconstructor{
     void ExtractSurface();
 
     void SortParticles();
-    void ReorderParticles();
     
     void ExtractSurfaceParticles();
     void ComputeColorFieldAndMarkParticles();
 
     void ExtractSurfaceVertices();
+	
 
     void ComputeScalarValues();
 

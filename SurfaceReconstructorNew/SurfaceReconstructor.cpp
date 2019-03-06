@@ -84,7 +84,7 @@ void SurfaceReconstructor::ExtractSurfaceVertices(){
 
 	printf("extracting surface vertices..\n");
 
-    cfloat3 aabbLen = cfloat3(infectRadius, infectRadius, infectRadius);
+    cfloat3 aabbLen = cfloat3(infectRadius, infectRadius, infectRadius) * 10;
     int numSurfaceVertices = 0;
 
     //scatter approach
@@ -97,21 +97,16 @@ void SurfaceReconstructor::ExtractSurfaceVertices(){
         cfloat3 boxMax = x + aabbLen;
         cint3 coordMin = surfaceGrid.GetVertexCoord(boxMin) + cint3(1,1,1);
         cint3 coordMax = surfaceGrid.GetVertexCoord(boxMax);
-        
+       
         for(int xx=coordMin.x; xx<=coordMax.x; xx++)
         for(int yy=coordMin.y; yy<=coordMax.y; yy++)
         for(int zz=coordMin.z; zz<=coordMax.z; zz++){
-            int index = surfaceGrid.GetVertexIndex(cint3(xx,yy,zz));
-            if( surfaceGrid.surfaceIndices[index] == -1 ){
-                surfaceGrid.surfaceIndices[index] = numSurfaceVertices ++;
-                SurfaceVertex sVertex;
-                sVertex.gridIndex = index;
-				sVertex.coord = cint3(xx,yy,zz);
-                surfaceGrid.surfaceVertices.push_back(sVertex);
-            }
+			cint3 coord(xx,yy,zz);
+			surfaceGrid.InsertSurfaceVertex(coord);
         }
     }
 }
+
 
 #include "Eigen/Eigen"
 using namespace Eigen;
@@ -206,5 +201,11 @@ void SurfaceReconstructor::ComputeScalarValues(){
 }
 
 void SurfaceReconstructor::Triangulate(){
+	MarchingCube marchingCube;
+	marchingCube.surfaceGrid = & surfaceGrid;
+	marchingCube.SetCubeWidth(surfaceGrid.cellWidth);
+	marchingCube.isoLevel = 0.5;
 
+	marchingCube.Marching();
+	marchingCube.mesh.Output("test.obj");
 }

@@ -47,6 +47,14 @@ public:
 		coord = floor((p - xmin)/cellWidth);
 		return coord;
 	}
+	int GetSurfaceIndex(cint3 coord) {
+		int gridIndex = GetVertexIndex(coord);
+		if(gridIndex < surfaceIndices.size())
+			return surfaceIndices[gridIndex];
+		else
+			return -1;
+	}
+
 
 	void Init() {
 		resolution = ceil((xmax-xmin)/cellWidth);
@@ -56,5 +64,21 @@ public:
 		surfaceVertices.clear();
 		for (int i=0; i<surfaceIndices.size(); i++)
 			surfaceIndices[i] = -1;
+	}
+
+	void InsertSurfaceVertex(cint3 coord) {
+		int index = GetVertexIndex(coord);
+		if(index == INVALID_CELL)
+			return;
+
+		if (surfaceIndices[index] == -1) {
+			surfaceIndices[index] = surfaceVertices.size();
+			SurfaceVertex sVertex;
+			sVertex.gridIndex = index;
+			sVertex.coord = coord;
+			surfaceVertices.push_back(sVertex);
+		}
+		else 
+			return;
 	}
 };
